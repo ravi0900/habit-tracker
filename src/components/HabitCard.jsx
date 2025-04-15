@@ -16,8 +16,8 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
   } = habit;
 
   // Check if habit is completed today
-  const today = new Date().toISOString().split('T')[0];
-  const isCompletedToday = completedDates.includes(today);
+  const today = new Date().toLocaleDateString('en-CA');
+  const isCompletedToday = completedDates.some(entry => entry.date === today);
 
   // Calculate streak
   const calculateStreak = () => {
@@ -27,9 +27,9 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
     for (let i = 0; i < 366; i++) {
       const date = new Date(currentDate);
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = date.toLocaleDateString('en-CA');
       
-      if (completedDates.includes(dateStr)) {
+      if (completedDates.some(entry => entry.date === dateStr)) {
         streak++;
       } else {
         break;
@@ -39,8 +39,7 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
   };
 
   const streak = calculateStreak();
-  const lastCompleted = completedDates.length > 0 ? 
-    new Date(Math.max(...completedDates.map(date => new Date(date)))) : null;
+  const lastCompleted = completedDates.length > 0 ? completedDates[completedDates.length - 1] : null;
 
   // Calculate completion percentage for current month
   const calculateMonthCompletion = () => {
@@ -55,8 +54,8 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
       const date = new Date(year, month, i);
       if (date > now) break; // Don't count future days
       
-      const dateStr = date.toISOString().split('T')[0];
-      if (completedDates.includes(dateStr)) {
+      const dateStr = date.toLocaleDateString('en-CA');
+      if (completedDates.some(entry => entry.date === dateStr)) {
         total++;
       }
     }
@@ -122,7 +121,9 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
       {lastCompleted && (
         <div className="last-completed" title="Last completed date and time">
           <FaRegCalendarCheck className="icon" />
-          <span>Last: {format(lastCompleted, lastCompleted.getHours() !== 0 || lastCompleted.getMinutes() !== 0 ? 'MMM d, yyyy, hh:mm a' : 'MMM d, yyyy')}</span>
+          <span>
+            Last: {format(new Date(lastCompleted.timestamp), "MMM d, yyyy 'at' h:mm a")}
+          </span>
         </div>
       )}
       

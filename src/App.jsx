@@ -103,14 +103,20 @@ function App() {
   const toggleComplete = (id) => {
     setHabits(prev => prev.map(habit => {
       if (habit.id === id) {
-        const today = new Date().toISOString().split('T')[0];
-        const isCompleted = !habit.completedDates.includes(today);
-        
+        const now = new Date();
+        const timestamp = now.getTime(); // epoch ms
+        const localDate = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+        const localTime = now.toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+        const isCompleted = !habit.completedDates.some(entry => entry.date === localDate);
         return {
           ...habit,
-          completedDates: isCompleted 
-            ? [...habit.completedDates, today]
-            : habit.completedDates.filter(date => date !== today)
+          completedDates: isCompleted
+            ? [...habit.completedDates, { date: localDate, time: localTime, timestamp }]
+            : habit.completedDates.filter(entry => entry.date !== localDate)
         };
       }
       return habit;
