@@ -162,8 +162,28 @@ body.dark-mode {
 .theme-toggle {
   position: fixed;
   bottom: 2rem;
-  right: 2rem;
-  z-index: 90;
+  left: 2rem;
+  z-index: 1000;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .theme-toggle {
+  background-color: var(--dark-bg-secondary);
+  border-color: var(--dark-border-color);
 }
 
 .habits-container {
@@ -197,94 +217,169 @@ body.dark-mode {
 
 .habit-card {
   background-color: var(--card-bg);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
-  margin-bottom: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.habit-card.dark {
-  background-color: var(--dark-bg-secondary);
-  border: 1px solid var(--dark-border-color);
+.habit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.habit-card.completed-today {
+  border-left: 4px solid var(--success-color);
+}
+
+.habit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
 }
 
 .habit-card h3 {
-  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--text-primary);
-  font-size: 1.25rem;
-  padding-right: 2rem;
+  margin-bottom: 0.5rem;
+  flex: 1;
 }
 
 .habit-card .description {
   color: var(--text-secondary);
   margin-bottom: 1rem;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
-.habit-card .habit-info {
+.habit-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.habit-info {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.habit-card .info-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.habit-card .icon {
-  color: var(--primary-color);
-}
-
-.habit-card .streak-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: rgba(var(--primary-rgb), 0.1);
-  color: var(--primary-color);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: 500;
-  margin-bottom: 1rem;
-}
-
-.habit-card .reminder-time,
-.habit-card .last-completed {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.info-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.habit-card .delete-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
   color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  background-color: rgba(var(--primary-rgb), 0.08);
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
 }
 
-.habit-card .delete-btn:hover {
-  color: var(--error-color);
-  background-color: rgba(var(--error-rgb), 0.1);
-}
-
-.habit-card .habit-actions {
-  margin-top: 1.5rem;
+.habit-stats {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #ff9800;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.streak-badge .icon {
+  color: #ff9800;
+}
+
+.streak-badge .streak-hot {
+  color: #ff5722;
+}
+
+.completion-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  max-width: 150px;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.completion-progress span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 35px;
+  text-align: right;
+}
+
+.habit-card .reminder-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.habit-card .last-completed {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.habit-actions {
+  margin-top: auto;
+  padding-top: 0.75rem;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--error-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.delete-btn:hover {
+  background-color: rgba(var(--error-rgb), 0.1);
+  color: var(--error-hover);
 }
 
 .habit-form {
@@ -698,6 +793,49 @@ body.dark-mode {
   .habits-container {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+}
+
+/* Accessibility helper classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .habits-container {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+  }
+  
+  .theme-toggle {
+    bottom: 1rem;
+    left: 1rem;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .app-container {
+    padding: 1rem;
   }
 }
 

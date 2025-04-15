@@ -14,8 +14,10 @@ const ThemeToggle = () => {
       onClick={() => setDarkMode(!darkMode)}
       className={`theme-toggle ${darkMode ? 'dark-mode' : ''}`}
       aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {darkMode ? <FiSun className="icon" /> : <FiMoon className="icon" />}
+      <span className="sr-only">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
     </button>
   );
 };
