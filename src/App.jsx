@@ -91,7 +91,8 @@ function App() {
       id: uuidv4(),
       createdAt: new Date().toISOString(),
       streak: 0,
-      completedDates: [],
+      longestStreak: 0,
+      completionHistory: [],
     };
     setHabits(prev => [...prev, newHabit]);
     setShowForm(false);
@@ -114,12 +115,38 @@ function App() {
           minute: '2-digit',
           hour12: true
         });
-        const isCompleted = !habit.completedDates.some(entry => entry.date === localDate);
+        // Defensive: ensure completionHistory is always an array
+        const history = Array.isArray(habit.completionHistory) ? habit.completionHistory : [];
+        const isCompleted = !history.some(entry => entry.date === localDate);
+        let updatedCompletionHistory = isCompleted
+          ? [...history, { date: localDate, time: localTime, timestamp }]
+          : history.filter(entry => entry.date !== localDate);
+        // Calculate streak
+        let streak = 0;
+        let longestStreak = 0;
+        let prevDate = null;
+        // Sort by date ascending
+        const sorted = [...updatedCompletionHistory].sort((a,b) => new Date(a.date) - new Date(b.date));
+        sorted.forEach(entry => {
+          const entryDate = new Date(entry.date);
+          if (prevDate) {
+            const diff = (entryDate - prevDate) / (1000*60*60*24);
+            if (diff === 1) {
+              streak += 1;
+            } else if (diff > 1) {
+              streak = 1;
+            }
+          } else {
+            streak = 1;
+          }
+          if (streak > longestStreak) longestStreak = streak;
+          prevDate = entryDate;
+        });
         return {
           ...habit,
-          completedDates: isCompleted
-            ? [...habit.completedDates, { date: localDate, time: localTime, timestamp }]
-            : habit.completedDates.filter(entry => entry.date !== localDate)
+          completionHistory: updatedCompletionHistory,
+          streak,
+          longestStreak
         };
       }
       return habit;

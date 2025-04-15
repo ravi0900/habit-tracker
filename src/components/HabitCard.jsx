@@ -14,13 +14,13 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
     description, 
     category,
     frequency,
-    completedDates = [],
+    completionHistory = [],
     reminderTime 
   } = habit;
 
   // Check if habit is completed today
   const today = new Date().toLocaleDateString('en-CA');
-  const isCompletedToday = completedDates.some(entry => entry.date === today);
+  const isCompletedToday = completionHistory.some(entry => entry.date === today);
 
   // Calculate streak
   const calculateStreak = () => {
@@ -32,7 +32,7 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
       date.setDate(date.getDate() - i);
       const dateStr = date.toLocaleDateString('en-CA');
       
-      if (completedDates.some(entry => entry.date === dateStr)) {
+      if (completionHistory.some(entry => entry.date === dateStr)) {
         streak++;
       } else {
         break;
@@ -43,9 +43,9 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
 
   const streak = calculateStreak();
   // Best streak
-  const bestStreak = completedDates.length > 0 ? Math.max(...(() => {
+  const bestStreak = completionHistory.length > 0 ? Math.max(...(() => {
     let best = 0, curr = 0, prev = null;
-    completedDates
+    completionHistory
       .map(entry => entry.date)
       .sort()
       .forEach(dateStr => {
@@ -66,7 +66,7 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
     return [best];
   })()) : 0;
 
-  const lastCompleted = completedDates.length > 0 ? completedDates[completedDates.length - 1] : null;
+  const lastCompleted = completionHistory.length > 0 ? completionHistory[completionHistory.length - 1] : null;
 
   // Calculate completion percentage for current month
   const calculateMonthCompletion = () => {
@@ -82,7 +82,7 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
       if (date > now) break; // Don't count future days
       
       const dateStr = date.toLocaleDateString('en-CA');
-      if (completedDates.some(entry => entry.date === dateStr)) {
+      if (completionHistory.some(entry => entry.date === dateStr)) {
         total++;
       }
     }

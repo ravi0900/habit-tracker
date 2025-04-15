@@ -16,7 +16,7 @@ const HabitDetailsPage = ({ habits, onToggleComplete, onDelete }) => {
       <button className="btn" onClick={() => navigate(-1)} style={{ marginBottom: 16 }}>← Back</button>
       <HabitCard habit={habit} onToggleComplete={onToggleComplete} onDelete={onDelete} />
       <h2 style={{ marginTop: 32 }}>Completion History</h2>
-      {habit.completedDates.length === 0 ? (
+      {habit.completionHistory.length === 0 ? (
         <p>No completions yet.</p>
       ) : (
         <table className="completion-history" style={{ width: "100%", marginTop: 16 }}>
@@ -27,7 +27,7 @@ const HabitDetailsPage = ({ habits, onToggleComplete, onDelete }) => {
             </tr>
           </thead>
           <tbody>
-            {habit.completedDates.map((entry, idx) => (
+            {habit.completionHistory.map((entry, idx) => (
               <tr key={idx}>
                 <td>{entry.date}</td>
                 <td>{entry.time}</td>
