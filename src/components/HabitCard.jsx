@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { FaFire, FaTrash, FaCheck, FaClock, FaTag, FaRegCalendarCheck } from 'react-icons/fa';
 import { format } from 'date-fns';
 import { ThemeContext } from '../context/ThemeContext';
+import { Link } from 'react-router-dom';
 
 const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
   const { darkMode } = useContext(ThemeContext);
@@ -67,76 +68,78 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
   const completionPercentage = calculateMonthCompletion();
 
   return (
-    <div className={`habit-card ${darkMode ? 'dark' : ''} ${isCompletedToday ? 'completed-today' : ''}`}>
-      <div className="habit-card-header">
-        <h3>{name}</h3>
-        <button 
-          className="delete-btn" 
-          onClick={() => onDelete(id)}
-          aria-label="Delete habit"
-          title="Delete habit"
-        >
-          <FaTrash />
-        </button>
-      </div>
-      
-      {description && <p className="description">{description}</p>}
-      
-      <div className="habit-meta">
-        <div className="habit-info">
-          <div className="info-item" title="Category">
-            <FaTag className="icon" />
-            <span>{category}</span>
+    <Link to={`/habit/${id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <div className={`habit-card ${darkMode ? 'dark' : ''} ${isCompletedToday ? 'completed-today' : ''}`}>
+        <div className="habit-card-header">
+          <h3>{name}</h3>
+          <button 
+            className="delete-btn" 
+            onClick={e => { e.preventDefault(); e.stopPropagation(); onDelete(id); }}
+            aria-label="Delete habit"
+            title="Delete habit"
+          >
+            <FaTrash />
+          </button>
+        </div>
+        
+        {description && <p className="description">{description}</p>}
+        
+        <div className="habit-meta">
+          <div className="habit-info">
+            <div className="info-item" title="Category">
+              <FaTag className="icon" />
+              <span>{category}</span>
+            </div>
+            <div className="info-item" title="Frequency">
+              <FaClock className="icon" />
+              <span>{frequency}</span>
+            </div>
           </div>
-          <div className="info-item" title="Frequency">
-            <FaClock className="icon" />
-            <span>{frequency}</span>
+          
+          <div className="habit-stats">
+            <div className="streak-badge" title={`Current streak: ${streak} days`}>
+              <FaFire className={`icon ${streak > 5 ? 'streak-hot' : ''}`} /> 
+              <span>{streak}</span>
+            </div>
+            
+            <div className="completion-progress" title={`${completionPercentage}% completed this month`}>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${completionPercentage}%` }}
+                ></div>
+              </div>
+              <span>{completionPercentage}%</span>
+            </div>
           </div>
         </div>
         
-        <div className="habit-stats">
-          <div className="streak-badge" title={`Current streak: ${streak} days`}>
-            <FaFire className={`icon ${streak > 5 ? 'streak-hot' : ''}`} /> 
-            <span>{streak}</span>
+        {reminderTime && (
+          <div className="reminder-time" title="Daily reminder">
+            <FaClock className="icon" /> Reminder: {format(new Date(`1970-01-01T${reminderTime}`), 'hh:mm a')}
           </div>
-          
-          <div className="completion-progress" title={`${completionPercentage}% completed this month`}>
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${completionPercentage}%` }}
-              ></div>
-            </div>
-            <span>{completionPercentage}%</span>
+        )}
+        
+        {lastCompleted && (
+          <div className="last-completed" title="Last completed date and time">
+            <FaRegCalendarCheck className="icon" />
+            <span>
+              Last: {format(new Date(lastCompleted.timestamp), "MMM d, yyyy 'at' h:mm a")}
+            </span>
           </div>
+        )}
+        
+        <div className="habit-actions">
+          <button 
+            className={`btn ${isCompletedToday ? 'btn-success' : 'btn-primary'}`}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleComplete(id); }}
+            title={isCompletedToday ? "Mark as incomplete" : "Mark as complete"}
+          >
+            <FaCheck /> {isCompletedToday ? 'Completed' : 'Mark Complete'}
+          </button>
         </div>
       </div>
-      
-      {reminderTime && (
-        <div className="reminder-time" title="Daily reminder">
-          <FaClock className="icon" /> Reminder: {format(new Date(`1970-01-01T${reminderTime}`), 'hh:mm a')}
-        </div>
-      )}
-      
-      {lastCompleted && (
-        <div className="last-completed" title="Last completed date and time">
-          <FaRegCalendarCheck className="icon" />
-          <span>
-            Last: {format(new Date(lastCompleted.timestamp), "MMM d, yyyy 'at' h:mm a")}
-          </span>
-        </div>
-      )}
-      
-      <div className="habit-actions">
-        <button 
-          className={`btn ${isCompletedToday ? 'btn-success' : 'btn-primary'}`}
-          onClick={() => onToggleComplete(id)}
-          title={isCompletedToday ? "Mark as incomplete" : "Mark as complete"}
-        >
-          <FaCheck /> {isCompletedToday ? 'Completed' : 'Mark Complete'}
-        </button>
-      </div>
-    </div>
+    </Link>
   );
 };
 

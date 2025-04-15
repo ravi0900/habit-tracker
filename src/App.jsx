@@ -12,6 +12,9 @@ import ThemeToggle from './components/ThemeToggle';
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
 import { AuthContext } from './context/AuthContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HabitDetailsPage from './components/HabitDetailsPage';
+import NotFound from './components/NotFound';
 import './styles/index.css';
 
 function App() {
@@ -152,81 +155,81 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <ThemeToggle />
-      {!user ? (
-        <div className="auth-container">
-          {showLogin ? (
-            <LoginForm onToggleForm={() => setShowLogin(false)} />
-          ) : (
-            <SignupForm onToggleForm={() => setShowLogin(true)} />
-          )}
-        </div>
-      ) : (
-        <>
-          <Header
-            onAddClick={() => setShowForm(true)}
-            onExport={handleExport}
-            onImport={handleImport}
-          />
-          
-          <div className="app-container">
-            <div className="tab-navigation">
-              <button 
-                className={`tab-button ${activeTab === 'habits' ? 'active' : ''}`}
-                onClick={() => setActiveTab('habits')}
-              >
-                Habits
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'stats' ? 'active' : ''}`}
-                onClick={() => setActiveTab('stats')}
-              >
-                Statistics
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'calendar' ? 'active' : ''}`}
-                onClick={() => setActiveTab('calendar')}
-              >
-                Calendar
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'achievements' ? 'active' : ''}`}
-                onClick={() => setActiveTab('achievements')}
-              >
-                Achievements
-              </button>
-            </div>
-
-            {showForm && (
-              <HabitForm 
-                onSubmit={addHabit}
-                onCancel={() => setShowForm(false)}
-              />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={
+          <div className="app">
+            <ThemeToggle />
+            {!user ? (
+              <div className="auth-container">
+                {showLogin ? (
+                  <LoginForm onToggleForm={() => setShowLogin(false)} />
+                ) : (
+                  <SignupForm onToggleForm={() => setShowLogin(true)} />
+                )}
+              </div>
+            ) : (
+              <>
+                <Header
+                  onAddClick={() => setShowForm(true)}
+                  onExport={handleExport}
+                  onImport={handleImport}
+                />
+                <div className="app-container">
+                  <div className="tab-navigation">
+                    <button 
+                      className={`tab-button ${activeTab === 'habits' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('habits')}
+                    >
+                      Habits
+                    </button>
+                    <button 
+                      className={`tab-button ${activeTab === 'stats' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('stats')}
+                    >
+                      Stats
+                    </button>
+                    <button 
+                      className={`tab-button ${activeTab === 'calendar' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('calendar')}
+                    >
+                      Calendar
+                    </button>
+                    <button 
+                      className={`tab-button ${activeTab === 'achievements' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('achievements')}
+                    >
+                      Achievements
+                    </button>
+                  </div>
+                  {showForm && <HabitForm onSave={addHabit} onCancel={() => setShowForm(false)} />}
+                  {activeTab === 'habits' && (
+                    <HabitList
+                      habits={habits}
+                      onToggleComplete={toggleComplete}
+                      onDelete={deleteHabit}
+                    />
+                  )}
+                  {activeTab === 'stats' && <Statistics habits={habits} />}
+                  {activeTab === 'calendar' && <Calendar habits={habits} />}
+                  {activeTab === 'achievements' && <Achievements habits={habits} />}
+                </div>
+                {notification && (
+                  <Notification 
+                    message={notification.message}
+                    isReminder={notification.isReminder}
+                  />
+                )}
+              </>
             )}
-
-            {activeTab === 'habits' && (
-              <HabitList
-                habits={habits}
-                onToggleComplete={toggleComplete}
-                onDelete={deleteHabit}
-              />
-            )}
-
-            {activeTab === 'stats' && <Statistics habits={habits} />}
-            {activeTab === 'calendar' && <Calendar habits={habits} />}
-            {activeTab === 'achievements' && <Achievements habits={habits} />}
           </div>
-
-          {notification && (
-            <Notification 
-              message={notification.message}
-              isReminder={notification.isReminder}
-            />
-          )}
-        </>
-      )}
-    </div>
+        } />
+        <Route path="/habit/:id" element={
+          <HabitDetailsPage habits={habits} onToggleComplete={toggleComplete} onDelete={deleteHabit} />
+        } />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
