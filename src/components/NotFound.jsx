@@ -1,22 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 
 export default function NotFound() {
   const { darkMode } = useContext(ThemeContext);
-
-  useEffect(() => {
-    // Set body background for full-page effect
-    if (darkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
-    return () => {
-      // Clean up on unmount
-      document.body.classList.remove('dark-mode');
-    };
-  }, [darkMode]);
 
   return (
     <div
