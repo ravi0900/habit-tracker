@@ -1,37 +1,75 @@
 .theme-toggle {
   position: fixed;
   bottom: 2rem;
-  right: 2rem;
-  width: 50px;
-  height: 50px;
+  left: 2rem;
+  z-index: 1000;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-}
-
-.theme-toggle.light {
-  background-color: var(--bg-color);
-  border: 2px solid var(--text-color);
-}
-
-.theme-toggle.dark {
-  background-color: var(--bg-color);
-  border: 2px solid var(--text-color);
 }
 
 .theme-toggle:hover {
   transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #fbbf24;
 }
 
-.icon {
-  font-size: 1.5rem;
+.dark-mode .theme-toggle {
+  background: var(--dark-bg-secondary);
+  border-color: var(--dark-border-color);
+}
+
+.theme-toggle .icon {
+  font-size: 1.25rem;
+  color: #fbbf24;
+  transition: transform 0.3s ease;
+}
+
+.dark-mode .theme-toggle .icon {
+  color: #fbbf24;
+  transform: rotate(360deg);
+}
+
+/* Animation for icon switch */
+.theme-toggle .sun-icon,
+.theme-toggle .moon-icon {
+  position: absolute;
   transition: all 0.3s ease;
+}
+
+.theme-toggle .sun-icon {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+.theme-toggle .moon-icon {
+  opacity: 0;
+  transform: rotate(-90deg);
+}
+
+.dark-mode .theme-toggle .sun-icon {
+  opacity: 0;
+  transform: rotate(90deg);
+}
+
+.dark-mode .theme-toggle .moon-icon {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+@media (max-width: 768px) {
+  .theme-toggle {
+    bottom: 0.5rem;
+    left: 0.5rem;
+  }
 }
 
 .tooltip {
