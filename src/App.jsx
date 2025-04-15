@@ -22,22 +22,60 @@ function App() {
   const [notification, setNotification] = useState(null);
   const [activeTab, setActiveTab] = useState('habits');
 
-  // Load user's habits when user changes
+  // 1. Initial load from localStorage (independent of auth context)
   useEffect(() => {
-    if (user) {
-      const savedHabits = localStorage.getItem(`habits_${user.email}`);
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser?.email) {
+      const savedHabits = localStorage.getItem(`habits_${storedUser.email}`);
       if (savedHabits) {
-        setHabits(JSON.parse(savedHabits));
+        try {
+          setHabits(JSON.parse(savedHabits));
+        } catch (e) {
+          console.error('Corrupted habits data, resetting...');
+          localStorage.removeItem(`habits_${storedUser.email}`);
+          setHabits([]);
+        }
       }
     }
-  }, [user]);
+  }, []);
 
-  // Save habits when they change
+  // 2. Handle auth state changes and data merging
   useEffect(() => {
-    if (user) {
-      localStorage.setItem(`habits_${user.email}`, JSON.stringify(habits));
+    if (user?.email) {
+      const savedHabits = localStorage.getItem(`habits_${user.email}`);
+      if (savedHabits) {
+        try {
+          const storedHabits = JSON.parse(savedHabits);
+          setHabits(prev => {
+            const mergedHabits = [...prev, ...storedHabits].reduce((acc, habit) => {
+              acc[habit.id] = habit;
+              return acc;
+            }, {});
+            return Object.values(mergedHabits);
+          });
+        } catch (e) {
+          console.error('Failed to merge habits:', e);
+        }
+      }
+    } else {
+      setHabits([]);
     }
-  }, [habits, user]);
+  }, [user?.email]);
+
+  // 3. Debounced save to localStorage
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const timeout = setTimeout(() => {
+      try {
+        localStorage.setItem(`habits_${user.email}`, JSON.stringify(habits));
+      } catch (e) {
+        console.error('LocalStorage write error:', e);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [habits, user?.email]);
 
   const showNotification = (message, isReminder = false) => {
     setNotification({ message, isReminder });
@@ -96,6 +134,9 @@ function App() {
       try {
         const importedHabits = JSON.parse(e.target.result);
         setHabits(importedHabits);
+        if (user?.email) {
+          localStorage.setItem(`habits_${user.email}`, JSON.stringify(importedHabits));
+        }
         showNotification('Habits imported successfully!');
       } catch (error) {
         showNotification('Error importing habits!');

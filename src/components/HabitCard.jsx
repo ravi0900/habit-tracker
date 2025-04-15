@@ -115,14 +115,14 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
       
       {reminderTime && (
         <div className="reminder-time" title="Daily reminder">
-          <FaClock className="icon" /> Reminder: {reminderTime}
+          <FaClock className="icon" /> Reminder: {format(new Date(`1970-01-01T${reminderTime}`), 'hh:mm a')}
         </div>
       )}
       
       {lastCompleted && (
-        <div className="last-completed" title="Last completed date">
+        <div className="last-completed" title="Last completed date and time">
           <FaRegCalendarCheck className="icon" />
-          <span>Last: {format(lastCompleted, 'MMM d, yyyy')}</span>
+          <span>Last: {format(lastCompleted, lastCompleted.getHours() !== 0 || lastCompleted.getMinutes() !== 0 ? 'MMM d, yyyy, hh:mm a' : 'MMM d, yyyy')}</span>
         </div>
       )}
       
