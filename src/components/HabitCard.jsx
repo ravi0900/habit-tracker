@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
-import { FaFire, FaTrash, FaCheck, FaClock, FaTag, FaRegCalendarCheck } from 'react-icons/fa';
+import { FaFireAlt } from 'react-icons/fa';
+import { GiLaurelCrown } from 'react-icons/gi';
+import { FaTrash, FaCheck, FaClock, FaTag, FaRegCalendarCheck } from 'react-icons/fa';
 import { format } from 'date-fns';
 import { ThemeContext } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
@@ -40,6 +42,30 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
   };
 
   const streak = calculateStreak();
+  // Best streak
+  const bestStreak = completedDates.length > 0 ? Math.max(...(() => {
+    let best = 0, curr = 0, prev = null;
+    completedDates
+      .map(entry => entry.date)
+      .sort()
+      .forEach(dateStr => {
+        if (!prev) { curr = 1; } 
+        else {
+          const prevDate = new Date(prev);
+          const currDate = new Date(dateStr);
+          prevDate.setDate(prevDate.getDate() + 1);
+          if (prevDate.toLocaleDateString('en-CA') === currDate.toLocaleDateString('en-CA')) {
+            curr++;
+          } else {
+            curr = 1;
+          }
+        }
+        best = Math.max(best, curr);
+        prev = dateStr;
+      });
+    return [best];
+  })()) : 0;
+
   const lastCompleted = completedDates.length > 0 ? completedDates[completedDates.length - 1] : null;
 
   // Calculate completion percentage for current month
@@ -97,11 +123,23 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
           </div>
           
           <div className="habit-stats">
-            <div className="streak-badge" title={`Current streak: ${streak} days`}>
-              <FaFire className={`icon ${streak > 5 ? 'streak-hot' : ''}`} /> 
-              <span>{streak}</span>
+            <div className="streak-badge" title={`Current streak: ${streak} days`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FaFireAlt style={{
+                fontSize: 38,
+                color: streak >= 7 ? '#ff4500' : '#ff9800',
+                filter: streak >= 21 ? 'drop-shadow(0 0 12px #ff9800)' : 'drop-shadow(0 0 5px #ff9800)',
+                verticalAlign: 'middle',
+                animation: streak >= 7 ? 'flame-flicker 1s infinite alternate' : 'none',
+                transition: 'color 0.3s, filter 0.3s'
+              }} />
+              <span style={{ fontSize: 24, fontWeight: 700 }}>{streak}</span>
+              {streak >= 7 && (
+                <span style={{ marginLeft: 4, fontSize: 18, color: '#ffd700', display: 'flex', alignItems: 'center' }}>
+                  <GiLaurelCrown style={{ fontSize: 24, marginRight: 2, color: '#ffd700', filter: 'drop-shadow(0 0 6px #ffd700)' }} />
+                  <span style={{ fontWeight: 600 }}>🔥</span>
+                </span>
+              )}
             </div>
-            
             <div className="completion-progress" title={`${completionPercentage}% completed this month`}>
               <div className="progress-bar">
                 <div 
@@ -112,6 +150,12 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
               <span>{completionPercentage}%</span>
             </div>
           </div>
+          {bestStreak > 0 && (
+            <div className="best-streak" style={{ color: '#ffd700', fontWeight: 600, fontSize: 14, marginTop: 4 }}>
+              <GiLaurelCrown style={{ fontSize: 18, marginRight: 2, verticalAlign: 'middle' }} />
+              Best streak: {bestStreak} days
+            </div>
+          )}
         </div>
         
         {reminderTime && (

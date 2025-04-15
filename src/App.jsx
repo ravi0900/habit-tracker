@@ -202,7 +202,7 @@ function App() {
                       Achievements
                     </button>
                   </div>
-                  {showForm && <HabitForm onSave={addHabit} onCancel={() => setShowForm(false)} />}
+                  {showForm && <HabitForm onSubmit={addHabit} onCancel={() => setShowForm(false)} />}
                   {activeTab === 'habits' && (
                     <HabitList
                       habits={habits}
