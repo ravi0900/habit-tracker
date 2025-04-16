@@ -7,7 +7,7 @@ import HabitList from './components/HabitList';
 import Statistics from './components/Statistics';
 import Calendar from './components/Calendar';
 import Achievements from './components/Achievements';
-import Notification from './components/Notification';
+import AppNotification from './components/Notification';
 import ThemeToggle from './components/ThemeToggle';
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
@@ -17,6 +17,74 @@ import HabitDetailsPage from './components/HabitDetailsPage';
 import NotFound from './components/NotFound';
 import './styles/index.css';
 
+// NotificationPermissionBanner component
+function NotificationPermissionBanner({ visible, onRequestPermission, onClose }) {
+  if (!visible) return null;
+  return (
+    <div style={{
+      width: '100%',
+      background: '#222',
+      color: '#fff',
+      padding: '1rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 2000,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+      position: 'relative',
+      marginBottom: '0.5rem',
+    }}>
+      <span style={{ marginRight: 16 }}>
+        Enable notifications to get habit reminders!
+      </span>
+      <button
+        onClick={onRequestPermission}
+        style={{
+          background: 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 6,
+          padding: '0.5rem 1.2rem',
+          fontWeight: 600,
+          cursor: 'pointer',
+          fontSize: 16,
+          boxShadow: '0 1px 4px rgba(0,0,0,0.09)',
+          marginRight: 16,
+        }}
+      >
+        Enable Notifications
+      </button>
+      <button
+        onClick={onClose}
+        aria-label="Close notification banner"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          color: '#fff',
+          fontSize: 22,
+          fontWeight: 700,
+          cursor: 'pointer',
+          position: 'absolute',
+          right: 18,
+          top: 8,
+        }}
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
+function getNotificationPermission() {
+  if (typeof window !== 'undefined' && 'Notification' in window) {
+    const perm = Notification.permission;
+    if (perm === 'default' || perm === 'granted' || perm === 'denied') {
+      return perm;
+    }
+  }
+  return 'default';
+}
+
 function App() {
   const { user } = useContext(AuthContext);
   const [showLogin, setShowLogin] = useState(true);
@@ -24,6 +92,19 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [notification, setNotification] = useState(null);
   const [activeTab, setActiveTab] = useState('habits');
+  const [showNotificationBanner, setShowNotificationBanner] = useState(false);
+  const [bannerClosed, setBannerClosed] = useState(false);
+  const [permission, setPermission] = useState(() => getNotificationPermission());
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      const interval = setInterval(() => {
+        const current = getNotificationPermission();
+        setPermission(current);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, []);
 
   // 1. Initial load from localStorage (independent of auth context)
   useEffect(() => {
@@ -96,6 +177,10 @@ function App() {
     };
     setHabits(prev => [...prev, newHabit]);
     setShowForm(false);
+    setBannerClosed(false);
+    if (permission === 'default') {
+      setShowNotificationBanner(true);
+    }
     showNotification('Habit created successfully!');
   };
 
@@ -181,8 +266,55 @@ function App() {
     reader.readAsText(file);
   };
 
+  const handleRequestPermission = () => {
+    if (
+      'Notification' in window &&
+      permission === 'default'
+    ) {
+      try {
+        console.log('[DEBUG] Notification object:', Notification);
+        console.log('[DEBUG] Notification.requestPermission:', Notification.requestPermission);
+        Notification.requestPermission().then((result) => {
+          setPermission(result);
+          setShowNotificationBanner(false);
+          setBannerClosed(true);
+          if (result === 'denied') {
+            alert('Notifications are blocked. Please enable them in your browser settings for this site.');
+          }
+        }).catch((err) => {
+          alert('Unable to request notification permissions. Please check your browser settings.');
+          console.error('Notification.requestPermission error:', err);
+        });
+      } catch (err) {
+        alert('Notification.requestPermission() could not be called. Please check your browser or environment.');
+        console.error('Notification.requestPermission error:', err);
+      }
+    } else if ('Notification' in window && permission === 'denied') {
+      alert('Notifications are blocked. Please enable them in your browser settings for this site.');
+    } else if (!('Notification' in window)) {
+      alert('Notifications are not supported in your browser.');
+    }
+  };
+
+  const handleCloseBanner = () => {
+    setShowNotificationBanner(false);
+    setBannerClosed(true);
+  };
+
+  // Debug log for all relevant state
+  console.log('[App] render', {
+    showNotificationBanner,
+    bannerClosed,
+    permission
+  });
+
   return (
     <BrowserRouter>
+      <NotificationPermissionBanner
+        visible={showNotificationBanner && !bannerClosed && permission === 'default'}
+        onRequestPermission={handleRequestPermission}
+        onClose={handleCloseBanner}
+      />
       <Routes>
         <Route path="/" element={
           <div className="app">
@@ -242,7 +374,7 @@ function App() {
                   {activeTab === 'achievements' && <Achievements habits={habits} />}
                 </div>
                 {notification && (
-                  <Notification 
+                  <AppNotification 
                     message={notification.message}
                     isReminder={notification.isReminder}
                   />
