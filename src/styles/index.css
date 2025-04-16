@@ -324,11 +324,20 @@ body.dark-mode {
   flex: 1;
 }
 
+.dark-mode .progress-bar {
+  background: #282d37 !important;
+  border: 1px solid #89a2be !important;
+}
+
 .progress-fill {
   height: 100%;
   background-color: var(--primary-color);
   border-radius: 4px;
   transition: width 0.3s ease;
+}
+
+.dark-mode .progress-fill {
+  background: #60a5fa !important;
 }
 
 .completion-progress span {
@@ -425,6 +434,28 @@ body.dark-mode {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(68, 102, 238, 0.1);
+}
+
+.dark-mode .form-group input {
+  background-color: #181a20;
+  color: #f3f4f6;
+  border: 1px solid #393e46;
+}
+
+.dark-mode .auth-form,
+.dark-mode .card {
+  border: none !important;
+  background-color: #23272f;
+}
+
+.dark-mode .auth-form input,
+.dark-mode .auth-form input:-webkit-autofill {
+  background-color: #181a20 !important;
+  color: #f3f4f6 !important;
+  -webkit-text-fill-color: #f3f4f6 !important;
+  border: 1px solid #393e46 !important;
+  box-shadow: 0 0 0 1000px #181a20 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .btn {
@@ -713,6 +744,7 @@ body.dark-mode {
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background-color: var(--bg-primary);
+  border-color: var(--light-border);
   color: var(--text-primary);
 }
 
