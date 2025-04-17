@@ -15,6 +15,7 @@ import { AuthContext } from './context/AuthContext';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HabitDetailsPage from './components/HabitDetailsPage';
 import NotFound from './components/NotFound';
+import NotificationTester from './components/NotificationTester';
 import './styles/index.css';
 
 // NotificationPermissionBanner component
@@ -315,6 +316,8 @@ function App() {
         onRequestPermission={handleRequestPermission}
         onClose={handleCloseBanner}
       />
+      {/* Notification Testing Panel */}
+      {import.meta.env.VITE_SHOW_NOTIFICATION_TESTER === 'true' && <NotificationTester />}
       <Routes>
         <Route path="/" element={
           <div className="app">
