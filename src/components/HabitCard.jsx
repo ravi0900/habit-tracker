@@ -107,28 +107,34 @@ const HabitCard = ({ habit, onDelete, onToggleComplete }) => {
   ];
 
   function sendHabitReminderNotification(habitTitle) {
-    if (window.Notification && Notification.permission === 'granted') {
-      const message = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
-      // Show notification with requireInteraction if supported
-      let notification;
-      try {
-        notification = new Notification(habitTitle, {
-          body: message,
-          icon: '/icon-192.png',
-          requireInteraction: true // Keeps notification visible (if supported)
-        });
-      } catch (e) {
-        notification = new Notification(habitTitle, {
-          body: message,
-          icon: '/icon-192.png'
-        });
-      }
-      // Close notification after 5 seconds (if possible)
-      if (notification) {
-        setTimeout(() => {
-          notification.close();
-        }, 5000);
-      }
+    const message = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+    // Always play sound if app is visible
+    if (document.visibilityState === 'visible' && audioRef.current) {
+      setPlaySound(true);
+    }
+    // Always try to send notification via service worker if permission is granted
+    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+      navigator.serviceWorker.getRegistration().then(registration => {
+        if (registration) {
+          registration.showNotification(habitTitle, {
+            body: message,
+            icon: '/logo192.png',
+            vibrate: [200, 100, 200],
+            requireInteraction: true
+          });
+        } else {
+          // fallback: show notification via Notification API (may not work in background)
+          try {
+            new Notification(habitTitle, {
+              body: message,
+              icon: '/logo192.png',
+              requireInteraction: true
+            });
+          } catch (e) {
+            // ignore
+          }
+        }
+      });
     }
   }
 
