@@ -5,9 +5,8 @@ export async function subscribeUserToPush() {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY.replace(/['\"]/g, ''))
     });
-    // Use backend URL from env
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
-    await fetch(`${backendUrl}/api/save-subscription`, {
+    
+    await fetch('https://habit-tracker-lh6e.onrender.com/api/save-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(subscription)
