@@ -16,6 +16,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HabitDetailsPage from './components/HabitDetailsPage';
 import NotFound from './components/NotFound';
 import NotificationTester from './components/NotificationTester';
+import { subscribeUserToPush } from './utils/push';
 import './styles/index.css';
 
 // NotificationPermissionBanner component
@@ -161,6 +162,13 @@ function App() {
 
     return () => clearTimeout(timeout);
   }, [habits, user?.email]);
+
+  // Subscribe to push notifications when user enables reminders/notifications
+  useEffect(() => {
+    if (Notification.permission === 'granted') {
+      subscribeUserToPush();
+    }
+  }, [permission]);
 
   const showNotification = (message, isReminder = false) => {
     setNotification({ message, isReminder });
